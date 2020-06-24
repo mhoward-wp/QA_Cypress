@@ -23,3 +23,42 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
+
+// import { Cookie } from 'puppeteer'
+
+let lastUserKey
+function logInAndVisit(visitPath, userKey) {
+  cy.getCookie('Arc-Token')
+    .then((cookie) => {
+      if (!cookie || userKey !== lastUserKey) {
+        cy.log('Logging in user', userKey)
+
+        if ((Cypress.config('baseUrl')).includes('localhost')) {
+          // Local auth
+          cy.request({
+            method: 'POST',
+            url: '/auth/form/local-users', // baseUrl is prepended to url
+            form: true,
+            body: {
+              u: userKey,
+              p: '',
+            },
+          })
+        } else {
+          // Okta auth
+          cy.task('authenticate', { userKey }).then((cookies) => {
+            (cookies).forEach((cookie) => {
+              cy.setCookie(cookie.name, cookie.value)
+            })
+          })
+        }
+      }
+
+      lastUserKey = userKey
+    })
+    .should('exist')
+
+  cy.visit(visitPath)
+}
+
+Cypress.Commands.add('logInAndVisit', logInAndVisit)

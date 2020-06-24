@@ -1,1 +1,9 @@
-{}
+{
+    "baseUrl": "https://sandbox.staging.arcpublishing.com",
+    "arccomposertest+admin@gmail.com": {
+
+        "password": "abcd",
+        "username": "arccomposertest+admin@gmail.com"
+    }
+}
+

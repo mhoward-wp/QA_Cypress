@@ -15,7 +15,29 @@
 /**
  * @type {Cypress.PluginConfig}
  */
-module.exports = (on, config) => {
-  // `on` is used to hook into various events Cypress emits
-  // `config` is the resolved Cypress config
+
+const getCookies = require('../support/get-cookies')
+
+module.exports = async (on, config) => { 
+    
+    on('task', {
+        // Log to node console - useful for headless / CI runs
+        // cy.task('log', { message: string, data: any })
+        
+        log({ message, data }) {
+            console.log(message, data)
+            return null
+        },
+
+        authenticate: ({ userKey }) => {
+            
+            return getCookies({
+
+                baseUrl: config.baseUrl,
+                username: userKey,
+                password: config.env.TEST_USER_PASSWORD,
+            })
+        }
+    })
+    return config
 }

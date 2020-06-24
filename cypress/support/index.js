@@ -18,3 +18,26 @@ import './commands'
 
 // Alternatively you can use CommonJS syntax:
 // require('./commands')
+
+Cypress.Cookies.defaults({
+
+  whitelist: ['Arc-Token', 'Arc-Client-Info'],
+})
+  
+before(() => {
+
+  cy.log(
+
+    'This should run only once before the entire test, which clears Arc-Token cookie.'
+  )
+
+  cy.clearCookie('Arc-Token')
+
+  Cypress.on('window:before:load', (win) => {
+
+    // Clear fetch to activate the polyfill which uses XHRs for network requests.
+    // This allows for capturing & stubbing of network requests until fetch is supported by Cypress.
+
+    win.fetch = null
+  })  
+})
